@@ -1,7 +1,7 @@
 folder_board = "STRAGA_china_8mb_core"
 
 
-freeze('$(PORT_DIR)/modules')
+freeze('$(PORT_DIR)/modules',  ('_boot.py', 'flashbdev.py', 'inisetup.py'))
 freeze('$(MPY_DIR)/tools', ('upip_utarfile.py'))
 freeze('$(MPY_DIR)/ports/esp8266/modules', 'ntptime.py')
 freeze('$(MPY_DIR)/drivers/onewire')

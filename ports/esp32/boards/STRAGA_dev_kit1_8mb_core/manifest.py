@@ -1,9 +1,11 @@
-freeze('$(PORT_DIR)/modules')
+folder_board = "STRAGA_dev_kit1_8mb_core"
+
+freeze('$(PORT_DIR)/modules',  ('_boot.py', 'flashbdev.py', 'inisetup.py'))
 freeze('$(MPY_DIR)/tools', ('upip_utarfile.py'))
 freeze('$(MPY_DIR)/ports/esp8266/modules', 'ntptime.py')
 freeze('$(MPY_DIR)/drivers/onewire')
 
-freeze('$(PORT_DIR)/boards/STRAGA_dev_kit1_8mb_core/modules')
+freeze('$(PORT_DIR)/boards/{}/modules'.format(folder_board))
 
 #freeze('$(MPY_DIR)/tools', ('upip.py', 'upip_utarfile.py'))
 #freeze('$(MPY_DIR)/ports/esp8266/modules', 'ntptime.py')
