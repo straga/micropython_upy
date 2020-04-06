@@ -95,7 +95,7 @@ STATIC void pwm_initChannel(esp32_pwm_obj_t *self)
 {
 	// Initialize the pwm timer
 	if (ledc_timer_config(&(pwm_timers[self->timer])) != ESP_OK) {
-		nlr_raise(mp_obj_new_exception_msg_varg(&mp_type_ValueError, "Error configuring pwm timer %d", self->timer));
+        mp_raise_msg_varg(&mp_type_ValueError, "Error configuring pwm timer %d", self->timer);
 	}
 
 	ledc_channel_config_t cfg = {
@@ -107,7 +107,7 @@ STATIC void pwm_initChannel(esp32_pwm_obj_t *self)
 		.timer_sel = pwm_timers[self->timer].timer_num,
 	};
 	if (ledc_channel_config(&cfg) != ESP_OK) {
-		nlr_raise(mp_obj_new_exception_msg_varg(&mp_type_ValueError, "Error configuring channel for pin %d", self->pin));
+        mp_raise_msg_varg(&mp_type_ValueError, "Error configuring channel for pin %d", self->pin);
 	}
 }
 
@@ -149,7 +149,7 @@ STATIC void esp32_pwm_init_helper(esp32_pwm_obj_t *self, size_t n_args, const mp
 		// === New PWM assignment
         if (timer < 0) timer = 0;
         if (timer > 3) {
-    		nlr_raise(mp_obj_new_exception_msg_varg(&mp_type_ValueError, "wrong timer requested: %d (0~3 allowed)", timer));
+            mp_raise_msg_varg(&mp_type_ValueError, "wrong timer requested: %d (0~3 allowed)", timer);
         }
         self->timer = timer;
         int channel;
@@ -164,7 +164,7 @@ STATIC void esp32_pwm_init_helper(esp32_pwm_obj_t *self, size_t n_args, const mp
 		for (int chan = 0; chan < LEDC_CHANNEL_MAX; ++chan) {
 			if (pwm_channels[channel]) {
 				if (pwm_channels[chan]->pin == self->pin) {
-					nlr_raise(mp_obj_new_exception_msg_varg(&mp_type_ValueError, "pin %d already used for pwm", self->pin));
+                    mp_raise_msg_varg(&mp_type_ValueError, "pin %d already used for pwm", self->pin);
 				}
 			}
 		}
@@ -191,7 +191,7 @@ STATIC void esp32_pwm_init_helper(esp32_pwm_obj_t *self, size_t n_args, const mp
 
     		if (old_freq != pwm_timers[self->timer].freq_hz) {
 				if (!set_freq(self, old_freq)) {
-					nlr_raise(mp_obj_new_exception_msg_varg(&mp_type_ValueError, "Error setting frequency %d for new timer", old_freq));
+                    mp_raise_msg_varg(&mp_type_ValueError, "Error setting frequency %d for new timer", old_freq);
 				}
     		}
             int new_duty = ledc_get_duty(PWMODE, self->channel);
@@ -207,7 +207,7 @@ STATIC void esp32_pwm_init_helper(esp32_pwm_obj_t *self, size_t n_args, const mp
     if (fqval != -1) {
         if (fqval != pwm_timers[self->timer].freq_hz) {
             if (!set_freq(self, fqval)) {
-                nlr_raise(mp_obj_new_exception_msg_varg(&mp_type_ValueError, "Bad frequency %d", fqval));
+                mp_raise_msg_varg(&mp_type_ValueError, "Bad frequency %d", fqval);
             }
         }
     }
@@ -216,7 +216,7 @@ STATIC void esp32_pwm_init_helper(esp32_pwm_obj_t *self, size_t n_args, const mp
     if (args[ARG_duty].u_obj != mp_const_none) {
     	float dperc = mp_obj_get_float(args[ARG_duty].u_obj);
     	if ((dperc < 0) || (dperc > 100-0)) {
-            nlr_raise(mp_obj_new_exception_msg_varg(&mp_type_ValueError, "Bad duty %.2f, use 0 ~ 100 (%%)", dperc));
+            mp_raise_msg_varg(&mp_type_ValueError, "Bad duty %.2f, use 0 ~ 100 (%%)", dperc);
     	}
     	// Calculate duty value
         ledc_set_duty(PWMODE, self->channel, perc2duty(self, dperc));
@@ -301,7 +301,7 @@ STATIC mp_obj_t esp32_pwm_freq(size_t n_args, const mp_obj_t *args)
     int new_freq = mp_obj_get_int(args[1]);
     if (new_freq != curr_freq) {
 		if (!set_freq(self, new_freq)) {
-			nlr_raise(mp_obj_new_exception_msg_varg(&mp_type_ValueError, "Bad frequency %d", new_freq));
+            mp_raise_msg_varg(&mp_type_ValueError, "Bad frequency %d", new_freq);
 		}
     }
     return mp_const_none;
@@ -322,7 +322,7 @@ STATIC mp_obj_t esp32_pwm_duty(size_t n_args, const mp_obj_t *args)
     // set the new duty cycle
     float dperc = mp_obj_get_float(args[1]);
 	if ((dperc < 0) || (dperc > 100.0)) {
-		nlr_raise(mp_obj_new_exception_msg_varg(&mp_type_ValueError, "Bad duty %d, use 0 ~ 100 (%%)", dperc));
+        mp_raise_msg_varg(&mp_type_ValueError, "Bad duty %d, use 0 ~ 100 (%%)", dperc);
 	}
 	ledc_set_duty(PWMODE, self->channel, perc2duty(self, dperc));
 	ledc_update_duty(PWMODE, self->channel);
